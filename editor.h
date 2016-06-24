@@ -1,3 +1,6 @@
+#ifndef EDITOR
+#define EDITOR
+
 #define CURSOR_UP "\033[1A"
 #define CURSOR_DOWN "\033[1B"
 #define CURSOR_RIGHT "\033[1C"
@@ -20,3 +23,5 @@ typedef struct termios termios;
 typedef struct winsize winsize;
 
 static winsize global_win;
+
+#endif
