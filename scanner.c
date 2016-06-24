@@ -6,6 +6,7 @@
 
 #include "editor.h"
 #include "scanner.h"
+#include "io.h"
 
 line* get_previous(int map, int next_line, line* changes){//get previous line
   FILE* fstream = fdopen(dup(map),"r");
