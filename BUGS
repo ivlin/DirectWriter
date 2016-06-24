@@ -1,0 +1,3 @@
+Segfaults when one scrolls too quickly
+Problems with small screen sizes
+Scrolling downwards sometimes causes the cursor to jump into the information buffer. It is necessary to scroll back up in order to scroll properly again.
