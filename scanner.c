@@ -8,12 +8,12 @@
 #include "scanner.h"
 #include "io.h"
 
-line* get_previous(int map, int next_line, line* changes){//get previous line
+line* get_previous(int map, int next_line, line* changes, winsize* global_win){//get previous line
   FILE* fstream = fdopen(dup(map),"r");
   line* first = (line*)malloc(sizeof(line));
   size_t buff_size = sizeof(first->text); 
-  first->text = (char*)malloc(sizeof(global_win.ws_col));
-  first->status = (char*)malloc(sizeof(global_win.ws_col));
+  first->text = (char*)malloc(sizeof(global_win->ws_col));
+  first->status = (char*)malloc(sizeof(global_win->ws_col));
   fseek(fstream,next_line,SEEK_SET);
   char temp;
   int off;
@@ -50,12 +50,12 @@ line* get_previous(int map, int next_line, line* changes){//get previous line
   return first;
 }
 
-line* get_next(int map, int previous_line, line* changes){//get next line
+line* get_next(int map, int previous_line, line* changes, winsize* global_win){//get next line
   FILE* fstream = fdopen(dup(map),"r");
   line* next = (line*)malloc(sizeof(line));
   size_t buff_size = sizeof(next->text);
-  next->text = (char*)malloc(sizeof(global_win.ws_col));
-  next->status = (char*)malloc(sizeof(global_win.ws_col));
+  next->text = (char*)malloc(sizeof(global_win->ws_col));
+  next->status = (char*)malloc(sizeof(global_win->ws_col));
   fseek(fstream,previous_line,SEEK_SET);
   getline(&next->text, &buff_size, fstream);
   next->file_offset = ftell(fstream);

@@ -6,8 +6,16 @@
 #include <unistd.h>
 
 #include "editor.h"
-#include "io.h"
 #include "scanner.h"
+#include "io.h"
+
+int print_buffers(line* first_line, winsize* global_win){
+  while (first_line != NULL){
+    printf("%*s\r%s",global_win->ws_col,first_line->status,first_line->text);
+    first_line = first_line->next;
+  }
+  printf("%*s\r%s",global_win->ws_col,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
+}
 
 int get_cursor(int* row, int* col, 
 	line* first_line, line** current_line){
@@ -39,8 +47,7 @@ int get_cursor(int* row, int* col,
   *current_line = first_line;
 }
 
-int detect_keypress(int* cursor_row, int* cursor_col, 
-	line** first_line_ptr, line** current_line, line** changed_lines, int map){
+int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, line** current_line, line** changed_lines, int map, winsize* global_win){
   int key;
   line* first_line = *first_line_ptr;
   key = getchar();
@@ -52,7 +59,7 @@ int detect_keypress(int* cursor_row, int* cursor_col,
       key = getchar();
       if (key == 65){
 	if (*cursor_row == 1 && first_line->file_offset > 1){//up
-	  line* new_first = get_previous(map,first_line->file_offset, *changed_lines);
+	  line* new_first = get_previous(map,first_line->file_offset, *changed_lines, global_win);
 	  new_first->next = *first_line_ptr;
 	  line* last;
 	  while (first_line->next != NULL){
@@ -79,15 +86,15 @@ int detect_keypress(int* cursor_row, int* cursor_col,
 	  *first_line_ptr = new_first;
 	  first_line = *first_line_ptr;
 	  printf(CURSOR_SAVE);
-	  print_buffers(first_line);
+	  print_buffers(first_line,global_win);
 	  printf(CURSOR_RESTORE);
 	}
 	printf(CURSOR_UP);
 	get_cursor(cursor_row, cursor_col,first_line,current_line);
       }
       else if (key == 66){
-	if (*cursor_row == global_win.ws_row-1){
-	  (*current_line)->next = get_next(map,(*current_line)->file_offset,*changed_lines);
+	if (*cursor_row == global_win->ws_row-1){
+	  (*current_line)->next = get_next(map,(*current_line)->file_offset,*changed_lines,global_win);
 	  (*first_line_ptr) = first_line->next;
 
 	  //adds changes
@@ -110,7 +117,7 @@ int detect_keypress(int* cursor_row, int* cursor_col,
 
 	  first_line = (*first_line_ptr);
 	  
-	  print_buffers(first_line);
+	  print_buffers(first_line,global_win);
 	 
 	   printf(CURSOR_UP);
 	}
@@ -140,32 +147,24 @@ int detect_keypress(int* cursor_row, int* cursor_col,
     line* cur = *current_line;
     strcpy(&cur->text[*cursor_col-2],&cur->text[*cursor_col-1]);
     printf(CLEAR_LINE);
-    printf("\r%*s\r%s",global_win.ws_col,cur->status,cur->text);
+    printf("\r%*s\r%s",global_win->ws_col,cur->status,cur->text);
     printf(CURSOR_RESTORE);
     *cursor_col = *cursor_col - 1;
   }
   else{
   	printf(CURSOR_RIGHT);
   	printf(CURSOR_SAVE);
-    char temp[global_win.ws_col];
+    char temp[global_win->ws_col];
     temp[0] = (char)key;
     temp[1] = 0;
     line* cur = *current_line;
     strcat(temp,&cur->text[*cursor_col-1]);
     strcpy(&cur->text[*cursor_col-1],temp);
     printf(CLEAR_LINE);
-    printf("\r%*s\r%s",global_win.ws_col,cur->status,cur->text);
+    printf("\r%*s\r%s",global_win->ws_col,cur->status,cur->text);
     printf(CURSOR_RESTORE);
   	*cursor_col = *cursor_col + 1;
   }
-}
-
-int print_buffers(line* first_line){
-  while (first_line != NULL){
-    printf("%*s\r%s",global_win.ws_col,first_line->status,first_line->text);
-    first_line = first_line->next;
-  }
-  printf("%*s\r%s",global_win.ws_col,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
 }
 
 int open_screen_buffer(termios* term){
@@ -180,3 +179,4 @@ int open_preserved_screen(termios* term){
   term->c_lflag = (ICANON|ECHO);
   tcsetattr(STDIN_FILENO,TCSANOW,term);
 }
+

@@ -14,7 +14,7 @@
 #include "scanner.h"
 #include "io.h"
 
-int init(line*);
+int init(line*,winsize* global_win);
 int cleanup(line*,line*);
 int fileops(line*);
 
@@ -22,20 +22,21 @@ int main(){
   int cursor_row, cursor_col, read_line;
   struct termios term;
   struct winsize window;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &global_win);
+  
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 
   line* first_line = (line*)malloc(sizeof(line));
   line* changed_lines = (line*)malloc(sizeof(line));
   line* current_line;
 
-  init(first_line);
+  init(first_line,&window);
 
   int map = open("./map",O_RDWR);
   fill_buffers(map,0,first_line);
   open_screen_buffer(&term);  
-  print_buffers(first_line);
+  print_buffers(first_line,&window);
 
-  while (detect_keypress(&cursor_row,&cursor_col,&first_line,&current_line,&changed_lines,map));
+  while (detect_keypress(&cursor_row,&cursor_col,&first_line,&current_line,&changed_lines,map,&window));
 
   open_preserved_screen(&term);
 
@@ -47,12 +48,12 @@ int main(){
 }
 
 
-int init(line* line_node){
+int init(line* line_node, winsize* global_win){
   int i;
-  for (i=1; i<global_win.ws_row ; i++){
-    line_node->text = (char*)malloc(global_win.ws_col);
-    line_node->status = (char*)malloc(global_win.ws_col);
-    if(i<global_win.ws_row - 1)
+  for (i=1; i<global_win->ws_row ; i++){
+    line_node->text = (char*)malloc(global_win->ws_col);
+    line_node->status = (char*)malloc(global_win->ws_col);
+    if(i<global_win->ws_row - 1)
     	line_node->next = (line*)malloc(sizeof(line));
     line_node = line_node->next;
   }

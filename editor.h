@@ -22,6 +22,6 @@ typedef struct line {
 typedef struct termios termios;
 typedef struct winsize winsize;
 
-static winsize global_win;
+//static winsize global_win;
 
 #endif
