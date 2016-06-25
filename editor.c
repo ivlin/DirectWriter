@@ -14,10 +14,6 @@
 #include "scanner.h"
 #include "io.h"
 
-int init(line*,winsize* global_win);
-int cleanup(line*,line*);
-int fileops(line*);
-
 int main(){
   int cursor_row, cursor_col, read_line;
   struct termios term;
@@ -50,7 +46,7 @@ int main(){
 
 int init(line* line_node, winsize* global_win){
   int i;
-  for (i=1; i<global_win->ws_row ; i++){
+  for (i=1; i<global_win->ws_row; i++){
     line_node->text = (char*)malloc(global_win->ws_col);
     line_node->status = (char*)malloc(global_win->ws_col);
     if(i<global_win->ws_row - 1)

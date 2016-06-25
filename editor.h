@@ -19,9 +19,17 @@ typedef struct line {
   char* status;
   struct line* next;
 } line;
+
+struct screen {
+  struct line* lines;
+  int rows, cols;
+};
+
 typedef struct termios termios;
 typedef struct winsize winsize;
 
-//static winsize global_win;
+int init(line*,winsize* global_win);
+int cleanup(line*,line*);
+int fileops(line*);
 
 #endif
