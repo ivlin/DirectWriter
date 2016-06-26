@@ -31,14 +31,13 @@ int main(){
   term_screen.lines = first_line;
   
   init(&term_screen);
-  //init(first_line,&window);
 
   int map = open("./map",O_RDWR);
   fill_buffers(map,0,term_screen.lines);
   open_screen_buffer(&term);  
-  print_buffers(term_screen.lines,&window);
-
-  while (detect_keypress(&cursor_row,&cursor_col,&term_screen.lines,&current_line,&changed_lines,map,&window));
+  print_buffers(&term_screen);
+ 
+  while (detect_keypress(&cursor_row,&cursor_col,&term_screen.lines,&current_line,&changed_lines,map,&term_screen));
 
   open_preserved_screen(&term);
 
