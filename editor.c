@@ -18,31 +18,35 @@ int main(){
   int cursor_row, cursor_col, read_line;
   struct termios term;
   struct winsize window;
-  
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
+  struct screen term_screen;
+  term_screen.rows=window.ws_row;
+  term_screen.cols=window.ws_col;
+  
   line* first_line = (line*)malloc(sizeof(line));
   line* changed_lines = (line*)malloc(sizeof(line));
   line* current_line;
 
+  term_screen.lines = first_line;
+  
   init(first_line,&window);
 
   int map = open("./map",O_RDWR);
-  fill_buffers(map,0,first_line);
+  fill_buffers(map,0,term_screen.lines);
   open_screen_buffer(&term);  
-  print_buffers(first_line,&window);
+  print_buffers(term_screen.lines,&window);
 
-  while (detect_keypress(&cursor_row,&cursor_col,&first_line,&current_line,&changed_lines,map,&window));
+  while (detect_keypress(&cursor_row,&cursor_col,&term_screen.lines,&current_line,&changed_lines,map,&window));
 
   open_preserved_screen(&term);
 
-  cleanup(first_line,changed_lines);
+  cleanup(term_screen.lines,changed_lines);
 
   fileops(changed_lines);
 
   close(map);
 }
-
 
 int init(line* line_node, winsize* global_win){
   int i;
