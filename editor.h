@@ -23,6 +23,7 @@ typedef struct line {
 struct screen {
   struct line* lines;
   int rows, cols;
+  int cur_row, cur_col;
 };
 
 typedef struct termios termios;

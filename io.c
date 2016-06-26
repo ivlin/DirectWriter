@@ -9,7 +9,6 @@
 #include "scanner.h"
 #include "io.h"
 
-
 int print_buffers(struct screen* term_screen){
   struct line* first_line = term_screen->lines;
   while (first_line != NULL){
@@ -19,23 +18,23 @@ int print_buffers(struct screen* term_screen){
   printf("%*s\r%s",term_screen->cols,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
 }
 
-int get_cursor(int* row, int* col, 
+int get_cursor(struct screen* term_screen, 
 	line* first_line, line** current_line){
   printf(GET_CURSOR);
   int temp;
   temp = getchar();//\033
   temp = getchar();//]
-  *row = getchar()-'0';//row
+  term_screen->cur_row = getchar()-'0';
   temp = getchar()-'0';
   while (temp >= 0 && temp <= 9){
-    *row = 10 * *row + temp; 
+    term_screen->cur_row = 10 * term_screen->cur_row + temp; 
     temp = getchar()-'0';
   }
   //; divider
-  *col = getchar()-'0';//col
+  term_screen->cur_col = getchar()-'0';//col
   temp = getchar()-'0';
   while (temp >= 0 && temp <= 9){
-    *col = 10 * *col + temp; 
+    term_screen->cur_col = 10 * term_screen->cur_col + temp; 
     temp = getchar()-'0';
   }
   while (temp != 'R'-'0'){
@@ -43,17 +42,15 @@ int get_cursor(int* row, int* col,
   }
   //update current_line
   int i;
-  for (i=1;i<*row;i++){
+  for (i=1;i<term_screen->cur_row;i++){
     first_line = first_line->next;
   }
   *current_line = first_line;
 }
 
-//int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, line** current_line, line** changed_lines, int map, struct screen* term_screen){
-int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, line** current_line, line** changed_lines, int map, struct screen* term_screen){
+int detect_keypress(line** current_line, line** changed_lines, int map, struct screen* term_screen){
   int key;
   line* first_line = term_screen->lines;
-  //line* first_line = *first_line_ptr;
   key = getchar();
   if (key == 17){//ctrl+q
     return 0;
@@ -62,9 +59,8 @@ int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, lin
     if (getchar() == '['){
       key = getchar();
       if (key == 65){
-	if (*cursor_row == 1 && first_line->file_offset > 1){//up
+	if (term_screen->cur_row == 1 && first_line->file_offset > 1){//up
 	  line* new_first = get_previous(map,first_line->file_offset, *changed_lines, term_screen);
-	  //new_first->next = *first_line_ptr;
 	  new_first->next = term_screen->lines;
 	  line* last;
 	  while (first_line->next != NULL){
@@ -89,8 +85,6 @@ int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, lin
 	  free(temp);
 
 	  term_screen->lines = new_first;
-	  //*first_line_ptr = new_first;
-	  //first_line = *first_line_ptr;
 	  first_line = term_screen->lines;
       
 	  printf(CURSOR_SAVE);
@@ -98,13 +92,12 @@ int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, lin
 	  printf(CURSOR_RESTORE);
 	}
 	printf(CURSOR_UP);
-	get_cursor(cursor_row, cursor_col,first_line,current_line);
+	get_cursor(term_screen,first_line,current_line);
       }
       else if (key == 66){
-	if (*cursor_row == term_screen->rows-1){
+	if (term_screen->cur_row == term_screen->rows-1){
 	  (*current_line)->next = get_next(map,(*current_line)->file_offset,*changed_lines,term_screen);
 
-	  //(*first_line_ptr) = first_line->next;
 	  term_screen->lines = first_line->next;
 	  
 	  //adds changes
@@ -113,53 +106,52 @@ int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, lin
 	  temp[strlen(temp)-1] = 0;
 	  line* changed_line = *changed_lines;
 	  if (strcmp(first_line->status,temp)){
-	  	while (changed_line->next != NULL){
-	  		changed_line = changed_line->next;
-	  	}
-	  	changed_line->next = first_line;
-	  	first_line->next=NULL;
+	    while (changed_line->next != NULL){
+	      changed_line = changed_line->next;
+	    }
+	    changed_line->next = first_line;
+	    first_line->next=NULL;
 	  }
 	  else{
-	  	free(first_line->text);
-	  	free(first_line->status);
-	  	free(first_line);
+	    free(first_line->text);
+	    free(first_line->status);
+	    free(first_line);
 	  }
 
-	  //first_line = (*first_line_ptr);
 	  first_line = term_screen->lines;
 	  
 	  print_buffers(term_screen);
 	  printf(CURSOR_UP);
 	}
 	else{
-		printf(CURSOR_DOWN);
+	  printf(CURSOR_DOWN);
 	}
-	get_cursor(cursor_row, cursor_col,first_line,current_line);
-	  }
+	
+	get_cursor(term_screen,first_line,current_line);
+      }
       else if (key == 67){
 	printf(CURSOR_RIGHT);
-	get_cursor(cursor_row, cursor_col,first_line,current_line);
+	get_cursor(term_screen,first_line,current_line);
       }
       else if (key == 68){
 	printf(CURSOR_LEFT);
-  	get_cursor(cursor_row, cursor_col,first_line,current_line);
+	get_cursor(term_screen,first_line,current_line);
       }
     }
   }
-  else if (*cursor_col-1 <= (*current_line)->begin_edit ||
-  	*cursor_col-1 > strlen((*current_line)->text)-1){
-  	//editing something that shouldn't be edited
+  else if (term_screen->cur_col-1 <= (*current_line)->begin_edit ||
+  	term_screen->cur_col-1 > strlen((*current_line)->text)-1){
   	return 1;
   }
   else if (key == 127){//backspace
   	printf(CURSOR_LEFT);
    	printf(CURSOR_SAVE);
     line* cur = *current_line;
-    strcpy(&cur->text[*cursor_col-2],&cur->text[*cursor_col-1]);
+    strcpy(&cur->text[term_screen->cur_col-2],&cur->text[term_screen->cur_col-1]);
     printf(CLEAR_LINE);
     printf("\r%*s\r%s",term_screen->cols,cur->status,cur->text);
     printf(CURSOR_RESTORE);
-    *cursor_col = *cursor_col - 1;
+    term_screen->cur_col = term_screen->cur_col - 1;
   }
   else{
   	printf(CURSOR_RIGHT);
@@ -168,12 +160,12 @@ int detect_keypress(int* cursor_row, int* cursor_col, line** first_line_ptr, lin
     temp[0] = (char)key;
     temp[1] = 0;
     line* cur = *current_line;
-    strcat(temp,&cur->text[*cursor_col-1]);
-    strcpy(&cur->text[*cursor_col-1],temp);
+    strcat(temp,&cur->text[term_screen->cur_col-1]);
+    strcpy(&cur->text[term_screen->cur_col-1],temp);
     printf(CLEAR_LINE);
     printf("\r%*s\r%s",term_screen->cols,cur->status,cur->text);
     printf(CURSOR_RESTORE);
-  	*cursor_col = *cursor_col + 1;
+  	term_screen->cur_col = term_screen->cur_col + 1;
   }
 }
 
