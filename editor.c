@@ -30,7 +30,8 @@ int main(){
 
   term_screen.lines = first_line;
   
-  init(first_line,&window);
+  init(&term_screen);
+  //init(first_line,&window);
 
   int map = open("./map",O_RDWR);
   fill_buffers(map,0,term_screen.lines);
@@ -48,12 +49,13 @@ int main(){
   close(map);
 }
 
-int init(line* line_node, winsize* global_win){
+int init(struct screen* term_screen){
+  struct line* line_node = term_screen->lines;
   int i;
-  for (i=1; i<global_win->ws_row; i++){
-    line_node->text = (char*)malloc(global_win->ws_col);
-    line_node->status = (char*)malloc(global_win->ws_col);
-    if(i<global_win->ws_row - 1)
+  for (i=1; i<term_screen->rows; i++){
+    line_node->text = (char*)malloc(term_screen->cols);
+    line_node->status = (char*)malloc(term_screen->cols);
+    if(i < term_screen->rows - 1)
     	line_node->next = (line*)malloc(sizeof(line));
     line_node = line_node->next;
   }

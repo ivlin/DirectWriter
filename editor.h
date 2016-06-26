@@ -28,7 +28,7 @@ struct screen {
 typedef struct termios termios;
 typedef struct winsize winsize;
 
-int init(line*,winsize* global_win);
+int init(struct screen*);
 int cleanup(line*,line*);
 int fileops(line*);
 
