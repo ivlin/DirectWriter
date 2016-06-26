@@ -27,22 +27,22 @@ line* get_previous(int map, int next_line, line* changes, struct screen* term_sc
   line* last = changes;
   changes = changes->next;
   while (changes!= NULL){
-  	if (changes->file_offset == first->file_offset){
-  		last->next = changes->next;
-  		free(first->text);
-  		free(first->status);
-  		free(first);
-  		fclose(fstream);
-  		return changes;
-  	}
-  	last = changes;
-  	changes = changes->next;
+    if (changes->file_offset == first->file_offset){
+      last->next = changes->next;
+      free(first->text);
+      free(first->status);
+      free(first);
+      fclose(fstream);
+      return changes;
+    }
+    last = changes;
+    changes = changes->next;
   }
 
   getline(&first->text, &buff_size, fstream);
   first->begin_edit = strlen(first->text)-1;
   while (first->text[first->begin_edit] != '/'){
-  	first->begin_edit = first->begin_edit - 1;
+    first->begin_edit = first->begin_edit - 1;
   }
   strcpy(first->status,&first->text[first->begin_edit+1]);
   *strchr(first->status,'\n') = 0;

@@ -29,6 +29,8 @@ int main(){
   line* current_line;
 
   term_screen.lines = first_line;
+  term_screen.changed_lines = changed_lines;
+  term_screen.current_line = current_line;
   
   init(&term_screen);
 
@@ -37,7 +39,6 @@ int main(){
   open_screen_buffer(&term);  
   print_buffers(&term_screen);
  
-  // while (detect_keypress(&cursor_row,&cursor_col,&current_line,&changed_lines,map,&term_screen));
   while (detect_keypress(&current_line,&changed_lines,map,&term_screen));
 
   open_preserved_screen(&term);

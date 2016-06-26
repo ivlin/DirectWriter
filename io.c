@@ -18,8 +18,8 @@ int print_buffers(struct screen* term_screen){
   printf("%*s\r%s",term_screen->cols,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
 }
 
-int get_cursor(struct screen* term_screen, 
-	line* first_line, line** current_line){
+int get_cursor(struct screen* term_screen, line** current_line){
+  struct line* first_line = term_screen->lines;
   printf(GET_CURSOR);
   int temp;
   temp = getchar();//\033
@@ -92,7 +92,7 @@ int detect_keypress(line** current_line, line** changed_lines, int map, struct s
 	  printf(CURSOR_RESTORE);
 	}
 	printf(CURSOR_UP);
-	get_cursor(term_screen,first_line,current_line);
+	get_cursor(term_screen,current_line);
       }
       else if (key == 66){
 	if (term_screen->cur_row == term_screen->rows-1){
@@ -125,17 +125,16 @@ int detect_keypress(line** current_line, line** changed_lines, int map, struct s
 	}
 	else{
 	  printf(CURSOR_DOWN);
-	}
-	
-	get_cursor(term_screen,first_line,current_line);
+	}	
+	get_cursor(term_screen,current_line);
       }
       else if (key == 67){
 	printf(CURSOR_RIGHT);
-	get_cursor(term_screen,first_line,current_line);
+	get_cursor(term_screen,current_line);
       }
       else if (key == 68){
 	printf(CURSOR_LEFT);
-	get_cursor(term_screen,first_line,current_line);
+	get_cursor(term_screen,current_line);
       }
     }
   }
@@ -181,4 +180,3 @@ int open_preserved_screen(termios* term){
   term->c_lflag = (ICANON|ECHO);
   tcsetattr(STDIN_FILENO,TCSANOW,term);
 }
-

@@ -22,6 +22,8 @@ typedef struct line {
 
 struct screen {
   struct line* lines;
+  struct line* changed_lines;
+  struct line* current_line;
   int rows, cols;
   int cur_row, cur_col;
 };
