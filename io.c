@@ -159,7 +159,6 @@ int detect_keypress(FILE* map, struct screen* term_screen){
     temp[0] = (char)key;
     temp[1] = 0;
     line* cur = term_screen->current_line;
-    //line* cur = *current_line;
     strcat(temp,&cur->text[term_screen->cur_col-1]);
     strcpy(&cur->text[term_screen->cur_col-1],temp);
     printf(CLEAR_LINE);
@@ -169,14 +168,14 @@ int detect_keypress(FILE* map, struct screen* term_screen){
   }
 }
 
-int open_screen_buffer(termios* term){
+int open_screen_buffer(struct termios* term){
   printf(ALT_BUFFER);
   tcgetattr(STDIN_FILENO,term);
   term->c_lflag = ~(ICANON|ECHO);
   tcsetattr(STDIN_FILENO,TCSANOW,term);
 }
 
-int open_preserved_screen(termios* term){
+int open_preserved_screen(struct termios* term){
   printf(PRESERVED_SCREEN);
   term->c_lflag = (ICANON|ECHO);
   tcsetattr(STDIN_FILENO,TCSANOW,term);

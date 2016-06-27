@@ -28,8 +28,8 @@ struct screen {
   int cur_row, cur_col;
 };
 
-typedef struct termios termios;
-typedef struct winsize winsize;
+struct termios;
+struct winsize;
 
 int init(struct screen*);
 int cleanup(line*,line*);
