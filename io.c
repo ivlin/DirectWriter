@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -48,7 +47,7 @@ int get_cursor(struct screen* term_screen){
   term_screen->current_line = first_line;
 }
 
-int detect_keypress(int map, struct screen* term_screen){
+int detect_keypress(FILE* map, struct screen* term_screen){
   int key;
   line* first_line = term_screen->lines;
   key = getchar();

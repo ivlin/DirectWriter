@@ -1,15 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/ioctl.h>
 
 #include "editor.h"
 #include "scanner.h"
 #include "io.h"
 
-line* get_previous(int map, struct screen* term_screen){
-  FILE* fstream = fdopen(dup(map),"r");
+
+line* get_previous(FILE* fstream, struct screen* term_screen){
   line* first = (line*)malloc(sizeof(line));
   line* changes = term_screen->changed_lines;
   size_t buff_size = sizeof(first->text); 
@@ -34,7 +32,6 @@ line* get_previous(int map, struct screen* term_screen){
       free(first->text);
       free(first->status);
       free(first);
-      fclose(fstream);
       return changes;
     }
     last = changes;
@@ -48,12 +45,10 @@ line* get_previous(int map, struct screen* term_screen){
   }
   strcpy(first->status,&first->text[first->begin_edit+1]);
   *strchr(first->status,'\n') = 0;
-  fclose(fstream);
   return first;
 }
 
-line* get_next(int map, struct screen* term_screen){
-  FILE* fstream = fdopen(dup(map),"r");
+line* get_next(FILE* fstream, struct screen* term_screen){
   line* next = (line*)malloc(sizeof(line));
   line* changes = term_screen->changed_lines;
   size_t buff_size = sizeof(next->text);
@@ -72,7 +67,6 @@ line* get_next(int map, struct screen* term_screen){
   		free(next->text);
   		free(next->status);
   		free(next);
-  		fclose(fstream);
   		return changes;
   	}
   	last = changes;
@@ -87,12 +81,11 @@ line* get_next(int map, struct screen* term_screen){
   }
   strcpy(next->status,&next->text[next->begin_edit+1]);
   *strchr(next->status,'\n') = 0;
-  fclose(fstream);
   return next;
 }
 
-int fill_buffers(int file, int start_read, line* first_line){
-  FILE* fstream = fdopen(dup(file),"r");
+
+int fill_buffers(FILE* fstream, int start_read, line* first_line){
   size_t buff_size = sizeof(first_line->text); 
   first_line->file_offset = 1;
   getline(&first_line->text, &buff_size, fstream);
@@ -106,9 +99,6 @@ int fill_buffers(int file, int start_read, line* first_line){
     first_line = first_line->next;
     first_line->file_offset = (int)ftell(fstream);
     getline(&first_line->text, &buff_size, fstream);
-    if (first_line->file_offset == -1){
-      printf("%s\n",strerror(errno));
-    }
     first_line->begin_edit = strlen(first_line->text)-1;
     while (first_line->text[first_line->begin_edit] != '/'){
     	first_line->begin_edit = first_line->begin_edit - 1;
@@ -116,5 +106,4 @@ int fill_buffers(int file, int start_read, line* first_line){
     strcpy(first_line->status,&first_line->text[first_line->begin_edit+1]);
     *strchr(first_line->status,'\n') = 0;
   }
-  fclose(fstream);
 }

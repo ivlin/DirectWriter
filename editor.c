@@ -1,12 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <dirent.h>
 #include <string.h>
-#include <strings.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 
@@ -34,7 +29,8 @@ int main(){
   
   init(&term_screen);
 
-  int map = open("./map",O_RDWR);
+  FILE* map = fopen("./map","r");
+
   fill_buffers(map,0,term_screen.lines);
   open_screen_buffer(&term);  
   print_buffers(&term_screen);
@@ -46,8 +42,8 @@ int main(){
   cleanup(term_screen.lines,changed_lines);
 
   fileops(changed_lines);
-
-  close(map);
+  
+  fclose(map);
 }
 
 int init(struct screen* term_screen){
