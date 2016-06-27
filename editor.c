@@ -39,10 +39,10 @@ int main(){
   open_screen_buffer(&term);  
   print_buffers(&term_screen);
  
-  while (detect_keypress(&current_line,&changed_lines,map,&term_screen));
+  while (detect_keypress(map,&term_screen));
 
   open_preserved_screen(&term);
-
+  
   cleanup(term_screen.lines,changed_lines);
 
   fileops(changed_lines);
