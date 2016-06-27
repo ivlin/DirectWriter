@@ -60,7 +60,7 @@ int detect_keypress(int map, struct screen* term_screen){
       key = getchar();
       if (key == 65){
 	if (term_screen->cur_row == 1 && first_line->file_offset > 1){//up
-	  line* new_first = get_previous(map,first_line->file_offset, term_screen->changed_lines, term_screen);
+	  line* new_first = get_previous(map,term_screen);
 
 	  new_first->next = term_screen->lines;
 	  line* last;
@@ -97,7 +97,7 @@ int detect_keypress(int map, struct screen* term_screen){
       }
       else if (key == 66){//DOWN
 	if (term_screen->cur_row == term_screen->rows-1){
-	  term_screen->current_line->next = get_next(map,term_screen->current_line->file_offset,term_screen->changed_lines,term_screen);
+	  term_screen->current_line->next = get_next(map,term_screen);
 	  term_screen->lines = first_line->next;
 	  
 	  //adds changes

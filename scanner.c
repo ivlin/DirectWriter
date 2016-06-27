@@ -8,10 +8,12 @@
 #include "scanner.h"
 #include "io.h"
 
-line* get_previous(int map, int next_line, line* changes, struct screen* term_screen){
+line* get_previous(int map, struct screen* term_screen){
   FILE* fstream = fdopen(dup(map),"r");
   line* first = (line*)malloc(sizeof(line));
+  line* changes = term_screen->changed_lines;
   size_t buff_size = sizeof(first->text); 
+  int next_line = term_screen->current_line->file_offset;
   first->text = (char*)malloc(sizeof(term_screen->cols));
   first->status = (char*)malloc(sizeof(term_screen->cols));
   fseek(fstream,next_line,SEEK_SET);
@@ -50,10 +52,12 @@ line* get_previous(int map, int next_line, line* changes, struct screen* term_sc
   return first;
 }
 
-line* get_next(int map, int previous_line, line* changes, struct screen* term_screen){
+line* get_next(int map, struct screen* term_screen){
   FILE* fstream = fdopen(dup(map),"r");
   line* next = (line*)malloc(sizeof(line));
+  line* changes = term_screen->changed_lines;
   size_t buff_size = sizeof(next->text);
+  int previous_line = term_screen->current_line->file_offset;;
   next->text = (char*)malloc(sizeof(term_screen->cols));
   next->status = (char*)malloc(sizeof(term_screen->cols));
   fseek(fstream,previous_line,SEEK_SET);
