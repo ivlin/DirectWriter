@@ -86,17 +86,8 @@ line* get_next(FILE* fstream, struct screen* term_screen){
 
 
 int fill_buffers(FILE* fstream, int start_read, line* first_line){
-  size_t buff_size = sizeof(first_line->text); 
-  first_line->file_offset = 1;
-  getline(&first_line->text, &buff_size, fstream);
-  first_line->begin_edit = strlen(first_line->text)-1;
-  while (first_line->text[first_line->begin_edit] != '/'){
-  	first_line->begin_edit = first_line->begin_edit - 1;
-  }
-  strcpy(first_line->status,&first_line->text[first_line->begin_edit+1]);
-  *strchr(first_line->status,'\n') = 0;
-  while(first_line->next != NULL){
-    first_line = first_line->next;
+  size_t buff_size = sizeof(first_line->text);   
+  while(first_line != NULL){
     first_line->file_offset = (int)ftell(fstream);
     getline(&first_line->text, &buff_size, fstream);
     first_line->begin_edit = strlen(first_line->text)-1;
@@ -105,5 +96,7 @@ int fill_buffers(FILE* fstream, int start_read, line* first_line){
     }
     strcpy(first_line->status,&first_line->text[first_line->begin_edit+1]);
     *strchr(first_line->status,'\n') = 0;
+    first_line = first_line->next;
   }
 }
+
