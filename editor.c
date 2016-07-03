@@ -24,7 +24,7 @@ int main(){
 
   FILE* map = fopen("./map","r");
 
-  fill_buffers(map,0,term_screen->lines);
+  fill_buffers(map,0,term_screen);
 
   open_screen_buffer(&term);  
 

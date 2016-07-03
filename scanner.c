@@ -85,7 +85,8 @@ line* get_next(FILE* fstream, struct screen* term_screen){
 }
 
 
-int fill_buffers(FILE* fstream, int start_read, line* first_line){
+int fill_buffers(FILE* fstream, int start_read, struct screen* term_screen){
+  line* first_line = term_screen->lines;
   size_t buff_size = sizeof(first_line->text);   
   while(first_line != NULL){
     first_line->file_offset = (int)ftell(fstream);
