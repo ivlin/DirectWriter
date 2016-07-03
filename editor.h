@@ -32,7 +32,7 @@ struct termios;
 struct winsize;
 
 int init(struct screen*);
-int cleanup(line*,line*);
-int fileops(line*);
+int cleanup(struct screen*);
+int fileops(struct screen*);
 
 #endif
