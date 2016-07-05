@@ -19,21 +19,22 @@ int main(){
   term_screen->cols=window.ws_col; 
   term_screen->lines = (line*)malloc(sizeof(line));
   term_screen->changed_lines = (line*)malloc(sizeof(line));
- 
-  init(term_screen);
+  term_screen->current_top = term_screen->lines;
+  //init(term_screen);
 
   FILE* map = fopen("./map","r");
+  init_and_fill_buffers(map,term_screen);
 
-  fill_buffers(map,0,term_screen);
-
+  //fill_buffers(map,0,term_screen);
+  
   open_screen_buffer(&term);  
 
-  print_buffers(term_screen);
+  print_buffers_2(term_screen);
  
   while (detect_keypress(map,term_screen));
 
   open_preserved_screen(&term);
-  
+
   cleanup(term_screen);
   fileops(term_screen);
   
@@ -45,7 +46,8 @@ int init(struct screen* term_screen){
   int i;
   for (i=1; i<term_screen->rows; i++){
     line_node->text = (char*)malloc(term_screen->cols);
-    line_node->status = (char*)malloc(term_screen->cols);
+    //unnecessary if getline is used, since getline automatically allocates memory if pointer is empty
+   line_node->status = (char*)malloc(term_screen->cols);
     if(i < term_screen->rows - 1)
     	line_node->next = (line*)malloc(sizeof(line));
     line_node = line_node->next;
@@ -64,9 +66,10 @@ int cleanup(struct screen* term_screen){
     temp = strdup(&line_node->text[line_node->begin_edit+1]);
     temp[strlen(temp)-1] = 0;
     if (strcmp(line_node->status,temp)){
-      line_node->next = NULL;
       changed->next = line_node;
       changed = changed->next;
+      line_node = line_node->next;
+      changed->next = NULL;
     }
     else{
       free(line_node);
@@ -102,3 +105,4 @@ int fileops(struct screen* term_screen){
     changes = changes->next;
   }
 }
+

@@ -26,6 +26,9 @@ struct screen {
   struct line* current_line;
   int rows, cols;
   int cur_row, cur_col;
+  
+  //used when tracking whole file
+  struct line* current_top;
 };
 
 struct termios;
