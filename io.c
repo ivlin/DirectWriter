@@ -9,19 +9,9 @@
 #include "io.h"
 
 int print_buffers(struct screen* term_screen){
-  struct line* first_line = term_screen->lines;
-  while (first_line != NULL){
-    printf("%*s\r%s",term_screen->cols,first_line->status,first_line->text);
-    first_line = first_line->next;
-  }
-  printf("%*s\r%s",term_screen->cols,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
-}
-
-int print_buffers_2(struct screen* term_screen){
   printf(CURSOR_ROW_COL,1,1);
   struct line* first_line = term_screen->current_top;
   int i;
-  first_line = first_line->next;
   for (i=0;i<term_screen->rows-1;i++){
     printf("%*s\r%s",term_screen->cols,first_line->status,first_line->text);
     first_line = first_line->next;
@@ -31,7 +21,6 @@ int print_buffers_2(struct screen* term_screen){
 
 int get_cursor(struct screen* term_screen){
   struct line* first_line = term_screen->current_top;
-  //struct line* first_line = term_screen->lines;
   printf(GET_CURSOR);
   int temp;
   temp = getchar();//\033
@@ -77,7 +66,7 @@ int detect_keypress(FILE* map, struct screen* term_screen){
 	  }
 	  term_screen->current_top=cur;
 	  printf(CURSOR_SAVE);
-	  print_buffers_2(term_screen);
+	  print_buffers(term_screen);
 	  printf(CURSOR_RESTORE);
 	}
 	else{
@@ -88,7 +77,7 @@ int detect_keypress(FILE* map, struct screen* term_screen){
       else if (key == 66){//DOWN
 	if (term_screen->cur_row >= term_screen->rows-1){
 	  term_screen->current_top = term_screen->current_top->next;
-	  print_buffers_2(term_screen);
+	  print_buffers(term_screen);
 	  printf(CURSOR_UP);
 	}
 	else{

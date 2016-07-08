@@ -35,7 +35,6 @@ struct screen {
 struct termios;
 struct winsize;
 
-int init(struct screen*);
 int cleanup(struct screen*);
 int fileops(struct screen*);
 
