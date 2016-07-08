@@ -5,6 +5,7 @@
 #define CURSOR_DOWN "\033[1B"
 #define CURSOR_RIGHT "\033[1C"
 #define CURSOR_LEFT "\033[1D"
+#define CURSOR_ROW_COL "\033[%d;%df"
 #define CURSOR_SAVE "\033[s"
 #define CURSOR_RESTORE "\033[u"
 #define ALT_BUFFER "\033[?1049h\033[H"

@@ -18,8 +18,10 @@ int print_buffers(struct screen* term_screen){
 }
 
 int print_buffers_2(struct screen* term_screen){
+  printf(CURSOR_ROW_COL,1,1);
   struct line* first_line = term_screen->current_top;
   int i;
+  first_line = first_line->next;
   for (i=0;i<term_screen->rows-1;i++){
     printf("%*s\r%s",term_screen->cols,first_line->status,first_line->text);
     first_line = first_line->next;
