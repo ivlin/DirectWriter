@@ -8,6 +8,7 @@
 #include "editor.h"
 #include "scanner.h"
 #include "io.h"
+#include "dirinfo.h"
 
 int main(){
   struct termios term;
@@ -20,21 +21,22 @@ int main(){
   term_screen->lines = (line*)malloc(sizeof(line));
   term_screen->changed_lines = (line*)malloc(sizeof(line));
   term_screen->current_top = term_screen->lines;
-
-  FILE* map = fopen("./map","r");
+  
+  FILE* map = generate_map_file(".");
+  rewind(map);
+  
   init_and_fill_buffers(map,term_screen);
   
-  open_screen_buffer(&term);  
+  open_screen_buffer(&term);
 
   print_buffers(term_screen);
  
-  while (detect_keypress(map,term_screen));
+  while (detect_keypress(term_screen));
 
   open_preserved_screen(&term);
 
   cleanup(term_screen);
   fileops(term_screen);
-  
   fclose(map);
 }
 

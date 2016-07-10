@@ -49,7 +49,7 @@ int get_cursor(struct screen* term_screen){
   term_screen->current_line = first_line;
 }
 
-int detect_keypress(FILE* map, struct screen* term_screen){
+int detect_keypress(struct screen* term_screen){
   int key;
   line* first_line = term_screen->lines;
   key = getchar();

@@ -16,8 +16,9 @@ int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
     }
     line_node->status = (char*)malloc(term_screen->cols);
     strcpy(line_node->status,&line_node->text[line_node->begin_edit+1]);
-    *strchr(line_node->status,'\n') = 0;
+    *strchr(line_node->status,'\n') = 0;    
     line_node->next = (line*)malloc(sizeof(line));
     line_node = line_node->next;
+    line_node->text = NULL;
   }
 }

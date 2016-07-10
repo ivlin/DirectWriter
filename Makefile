@@ -1,10 +1,7 @@
-all: ./dirinfo.out ./editor.out
+all: ./editor.out
 
-./dirinfo.out: dirinfo.c
-	gcc -o dirinfo.out dirinfo.c
-
-./editor.out: editor.c editor.h scanner.c scanner.h io.c io.h
-	gcc -o editor.out editor.c io.c scanner.c
+./editor.out: editor.c editor.h scanner.c scanner.h io.c io.h dirinfo.c dirinfo.h
+	gcc -o editor.out editor.c io.c scanner.c dirinfo.c
 
 clean:
 	rm *.out *.o *~ #*
