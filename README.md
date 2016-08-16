@@ -1,4 +1,5 @@
 #Directory Typer (Prototype)
+An incomplete attempt to create a terminal based tool for easy directory and file manipulation.
 
 #Description
 As of present, this project lets you create a list of a directory tree. Any changes made through the editor will be replicated with the actual files, so all renaming can be done in one place.
