@@ -6,6 +6,9 @@
 #include "scanner.h"
 #include "io.h"
 
+/*
+  Initializes each line in term_screen using the input from the indicated file stream.
+*/
 int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
   line* line_node = term_screen->lines;
   size_t buff_size = sizeof(line_node->text);
