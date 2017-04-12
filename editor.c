@@ -40,6 +40,9 @@ int main(){
   fclose(map);
 }
 
+/*
+  Deallocates all allocated memory
+*/
 int cleanup(struct screen* term_screen){
   line* line_node = term_screen->lines;
   line* changed = term_screen->changed_lines;
@@ -67,6 +70,9 @@ int cleanup(struct screen* term_screen){
   return 0;
 }
 
+/*
+    Applies changes to the actual files
+*/
 int fileops(struct screen* term_screen){
   line* changes = term_screen->changed_lines;
   char* temp;
