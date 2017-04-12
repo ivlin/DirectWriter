@@ -6,6 +6,9 @@
 #include <errno.h>
 #include <fcntl.h>
 
+/*
+	Reads through the current directory and recursively goes through all subdirectories printing their contents to the map file
+*/
 int read_top_level(char *path, FILE* map_file, int level){
   DIR *dir;
 
@@ -42,6 +45,9 @@ int read_top_level(char *path, FILE* map_file, int level){
   return 0;
 }
 
+/*
+	Creates a file to print the directory structure at the specified path
+*/
 FILE* generate_map_file(char* path){
   FILE* map_file = tmpfile();
   read_top_level(path,map_file,0);
