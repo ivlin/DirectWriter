@@ -8,6 +8,9 @@
 #include "scanner.h"
 #include "io.h"
 
+/*
+	Goes through the screen and prints out all visible lines.
+*/
 int print_buffers(struct screen* term_screen){
   printf(CURSOR_ROW_COL,1,1);
   struct line* first_line = term_screen->current_top;
@@ -19,6 +22,9 @@ int print_buffers(struct screen* term_screen){
   printf("%*s\r%s",term_screen->cols,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
 }
 
+/*
+	Updates the position of the cursor in the terminal window.
+*/
 int get_cursor(struct screen* term_screen){
   struct line* first_line = term_screen->current_top;
   printf(GET_CURSOR);
@@ -49,6 +55,9 @@ int get_cursor(struct screen* term_screen){
   term_screen->current_line = first_line;
 }
 
+/*
+	Keypress listener
+*/
 int detect_keypress(struct screen* term_screen){
   int key;
   line* first_line = term_screen->lines;
@@ -125,6 +134,9 @@ int detect_keypress(struct screen* term_screen){
   }
 }
 
+/*
+	Saves and clears the terminal for writing
+*/
 int open_screen_buffer(struct termios* term){
   printf(ALT_BUFFER);
   tcgetattr(STDIN_FILENO,term);
@@ -132,6 +144,9 @@ int open_screen_buffer(struct termios* term){
   tcsetattr(STDIN_FILENO,TCSANOW,term);
 }
 
+/*
+	Loads the saved terminal
+*/
 int open_preserved_screen(struct termios* term){
   printf(PRESERVED_SCREEN);
   term->c_lflag = (ICANON|ECHO);
