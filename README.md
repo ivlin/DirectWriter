@@ -1,25 +1,27 @@
-# Directory Typer (Prototype)
-A terminal based tool for easy, fast file manipulation. Written in C and
+# Directory Writer
+A terminal based tool for easy, fast file manipulation. Written in C.
 
 # Description
-As of present, this project lets you create a list of a directory tree. Any changes made through the editor will be replicated with the actual files, so all renaming can be done in one place.
+This project writes out the structure of a directory as text in your terminal. You can then edit the text in-terminal and any changes made through the editor will be applied to the actual file names, so all renaming can be done in one place.
+
+# Motivation
+While simple scripts and regexes can easily rename large batches files with a consistent naming scheme, things are not as simple when the original or modified filenames don't follow any specific pattern. Whether on GUI or command line, the process becomes a tedious process of keystrokes. Directory Writer reduces the time spent on this meaningless labour.
 
 # Usage
 Just run
-```$make run```
+```$ make run```
 to start editing your current directory!
 
 If you would like to use a choose a different directory to work with, run<br>
 ```
-~$make all
--$./dirinfo [directory]
--$./editor
+~$ make all
+-$ ./dirinfo [directory]
+-$ ./editor
 ```
 separately
 
-# Unfinished
-Due to time constraints, only renaming files is allowed. Renaming directories, deleting, and creating new files and directories is a work in progress. There is also little protection against user error.<br>
-Only basic typing functionality works. Input and backspace both work. But things like delete and insertion mode do not. 
+# Future Development
+Since renaming files is allowed, the application may as well integrate moving and removing files as well.
 
 # Bugs
 -Segfaults when one scrolls too quickly<br>
