@@ -16,7 +16,7 @@ int print_buffers(struct screen* term_screen){
   struct line* first_line = term_screen->current_top;
   int i;
   for (i=0;i<term_screen->rows-1;i++){
-    printf("%*s\r%s",term_screen->cols,first_line->status,first_line->text);
+    printf("%*s\r%s",term_screen->cols,first_line->original,first_line->text);
     first_line = first_line->next;
   }
   printf("%*s\r%s",term_screen->cols,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
@@ -114,7 +114,7 @@ int detect_keypress(struct screen* term_screen){
 	line* cur = term_screen->current_line;
 	strcpy(&cur->text[term_screen->cur_col-2],&cur->text[term_screen->cur_col-1]);
 	printf(CLEAR_LINE);
-	printf("\r%*s\r%s",term_screen->cols,cur->status,cur->text);
+	printf("\r%*s\r%s",term_screen->cols,cur->original,cur->text);
 	printf(CURSOR_RESTORE);
 	term_screen->cur_col = term_screen->cur_col - 1;
   }
@@ -128,7 +128,7 @@ int detect_keypress(struct screen* term_screen){
     strcat(temp,&cur->text[term_screen->cur_col-1]);
     strcpy(&cur->text[term_screen->cur_col-1],temp);
     printf(CLEAR_LINE);
-    printf("\r%*s\r%s",term_screen->cols,cur->status,cur->text);
+    printf("\r%*s\r%s",term_screen->cols,cur->original,cur->text);
     printf(CURSOR_RESTORE);
   	term_screen->cur_col = term_screen->cur_col + 1;
   }

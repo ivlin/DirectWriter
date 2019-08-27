@@ -1,3 +1,7 @@
+/**
+editor.c - main file for editing operations
+**/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -53,7 +57,7 @@ int cleanup(struct screen* term_screen){
   while (line_node->next){
     temp = strdup(&line_node->text[line_node->begin_edit+1]);
     temp[strlen(temp)-1] = 0;
-    if (strcmp(line_node->status,temp)){
+    if (strcmp(line_node->original,temp)){
       changed->next = line_node;
       changed = changed->next;
       line_node = line_node->next;
@@ -62,7 +66,7 @@ int cleanup(struct screen* term_screen){
     else{
       free(line_node);
       free(line_node->text);
-      free(line_node->status);
+      free(line_node->original);
       line_node = line_node->next;
     }
     free(temp);
@@ -82,15 +86,15 @@ int fileops(struct screen* term_screen){
   while (changes != NULL){
     temp = strdup(&changes->text[changes->begin_edit+1]);
     temp[strlen(temp)-1] = 0;
-    if (strcmp(changes->status,temp)){
+    if (strcmp(changes->original,temp)){
       strcpy(path,changes->text);
       changes->text[strlen(changes->text)-1]=0;
-      strcpy(&path[changes->begin_edit+1],changes->status);
+      strcpy(&path[changes->begin_edit+1],changes->original);
       printf("Renaming %s to %s\n",path,changes->text);
       rename(path,changes->text);
     }
     free(changes->text);
-    free(changes->status);
+    free(changes->original);
     free(changes);
     free(temp);
     changes = changes->next;

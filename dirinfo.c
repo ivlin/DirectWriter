@@ -7,7 +7,7 @@
 #include <fcntl.h>
 
 /*
-	Reads through the current directory and recursively goes through all subdirectories printing their contents to the map file
+  Reads through the current directory and recursively goes through all subdirectories printing their contents to the map file
 */
 int read_top_level(char *path, FILE* map_file, int level){
   DIR *dir;

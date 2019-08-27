@@ -4,4 +4,7 @@ all: ./editor.out
 	gcc -o editor.out editor.c io.c scanner.c dirinfo.c
 
 clean:
-	rm *.out *.o *~ #*
+	rm *.out; rm *.o; rm *~; rm \#*
+
+test:
+	mv editor.out ../hi

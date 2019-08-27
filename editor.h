@@ -17,7 +17,7 @@ typedef struct line {
   int file_offset;
   int begin_edit; 
   char* text; 
-  char* status;
+  char* original;
   struct line* next;
 } line;
 
@@ -35,7 +35,16 @@ struct screen {
 struct termios;
 struct winsize;
 
+/*
+cleanup - frees allocated memory
+@param screen * - struct that represents the virtual window pre-initialized with its dimensions
+*/
 int cleanup(struct screen*);
+
+/*
+fileops - applies changes to the actual file
+@param screen * - struct that represents virtual window and all lines
+*/
 int fileops(struct screen*);
 
 #endif

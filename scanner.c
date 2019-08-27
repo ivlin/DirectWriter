@@ -17,9 +17,9 @@ int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
     while (line_node->text[line_node->begin_edit] != '/'){
     	line_node->begin_edit = line_node->begin_edit - 1;
     }
-    line_node->status = (char*)malloc(term_screen->cols);
-    strcpy(line_node->status,&line_node->text[line_node->begin_edit+1]);
-    *strchr(line_node->status,'\n') = 0;    
+    line_node->original = (char*)malloc(term_screen->cols);
+    strcpy(line_node->original,&line_node->text[line_node->begin_edit+1]);
+    *strchr(line_node->original,'\n') = 0;    
     line_node->next = (line*)malloc(sizeof(line));
     line_node = line_node->next;
     line_node->text = NULL;
