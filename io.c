@@ -16,10 +16,10 @@ int print_buffers(struct screen* term_screen){
   struct line* first_line = term_screen->current_top;
   int i;
   for (i=0;i<term_screen->rows-1;i++){
-    printf("%*s\r%s",term_screen->cols,first_line->original,first_line->text);
+    printf("%*s\r%s%s\n",term_screen->cols,first_line->original,first_line->path,first_line->revised);
     first_line = first_line->next;
   }
-  printf("%*s\r%s",term_screen->cols,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
+  printf("%*s\r%d%s",term_screen->cols,"ORIGINAL",term_screen->cur_col,"NEWNAME(CTRL+Q to EXIT)");
 }
 
 /*
@@ -34,14 +34,14 @@ int get_cursor(struct screen* term_screen){
   term_screen->cur_row = getchar()-'0';
   temp = getchar()-'0';
   while (temp >= 0 && temp <= 9){
-    term_screen->cur_row = 10 * term_screen->cur_row + temp; 
+    term_screen->cur_row = 10 * term_screen->cur_row + temp;
     temp = getchar()-'0';
   }
   //; divider
   term_screen->cur_col = getchar()-'0';//col
   temp = getchar()-'0';
   while (temp >= 0 && temp <= 9){
-    term_screen->cur_col = 10 * term_screen->cur_col + temp; 
+    term_screen->cur_col = 10 * term_screen->cur_col + temp;
     temp = getchar()-'0';
   }
   while (temp != 'R'-'0'){
@@ -105,16 +105,16 @@ int detect_keypress(struct screen* term_screen){
     }
   }
   else if (term_screen->cur_col-1 <= term_screen->current_line->begin_edit ||
-	   term_screen->cur_col-1 > strlen(term_screen->current_line->text)-1){
+	   term_screen->cur_col-1 > strlen(term_screen->current_line->revised)+strlen(term_screen->current_line->path)-1){
     return 1;
   }
   else if (key == 127){//backspace
   	printf(CURSOR_LEFT);
    	printf(CURSOR_SAVE);
 	line* cur = term_screen->current_line;
-	strcpy(&cur->text[term_screen->cur_col-2],&cur->text[term_screen->cur_col-1]);
+	strcpy(&cur->revised[term_screen->cur_col-cur->begin_edit-3],&cur->revised[term_screen->cur_col-cur->begin_edit-2]);
 	printf(CLEAR_LINE);
-	printf("\r%*s\r%s",term_screen->cols,cur->original,cur->text);
+	printf("\r%*s\r%s%s",term_screen->cols,cur->original,cur->path,cur->revised);
 	printf(CURSOR_RESTORE);
 	term_screen->cur_col = term_screen->cur_col - 1;
   }
@@ -125,10 +125,10 @@ int detect_keypress(struct screen* term_screen){
     temp[0] = (char)key;
     temp[1] = 0;
     line* cur = term_screen->current_line;
-    strcat(temp,&cur->text[term_screen->cur_col-1]);
-    strcpy(&cur->text[term_screen->cur_col-1],temp);
+    strcat(temp,&cur->revised[(term_screen->cur_col)-(cur->begin_edit+2)]);
+    strcpy(&cur->revised[term_screen->cur_col-(cur->begin_edit+2)],temp);
     printf(CLEAR_LINE);
-    printf("\r%*s\r%s",term_screen->cols,cur->original,cur->text);
+    printf("\r%*s\r%s%s",term_screen->cols,cur->original,cur->path,cur->revised);
     printf(CURSOR_RESTORE);
   	term_screen->cur_col = term_screen->cur_col + 1;
   }

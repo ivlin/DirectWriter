@@ -18,23 +18,23 @@ int main(){
   struct termios term;
   struct winsize window;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
-  
+
   struct screen* term_screen = (struct screen*)malloc(sizeof(struct screen));
   term_screen->rows=window.ws_row;
-  term_screen->cols=window.ws_col; 
+  term_screen->cols=window.ws_col;
   term_screen->lines = (line*)malloc(sizeof(line));
   term_screen->changed_lines = (line*)malloc(sizeof(line));
   term_screen->current_top = term_screen->lines;
-  
+
   FILE* map = generate_map_file(".");
   rewind(map);
-  
+
   init_and_fill_buffers(map,term_screen);
-  
+
   open_screen_buffer(&term);
 
   print_buffers(term_screen);
- 
+
   while (detect_keypress(term_screen));
 
   open_preserved_screen(&term);
@@ -55,7 +55,7 @@ int cleanup(struct screen* term_screen){
   }
   char* temp;
   while (line_node->next){
-    temp = strdup(&line_node->text[line_node->begin_edit+1]);
+    temp = strdup(&line_node->revised[line_node->begin_edit+1]);
     temp[strlen(temp)-1] = 0;
     if (strcmp(line_node->original,temp)){
       changed->next = line_node;
@@ -65,7 +65,7 @@ int cleanup(struct screen* term_screen){
     }
     else{
       free(line_node);
-      free(line_node->text);
+      free(line_node->revised);
       free(line_node->original);
       line_node = line_node->next;
     }
@@ -79,24 +79,22 @@ int cleanup(struct screen* term_screen){
 */
 int fileops(struct screen* term_screen){
   line* changes = term_screen->changed_lines;
-  char* temp;
-  char path[512];
+  char old_file_w_path[512];
+  char new_file_w_path[512];
   free(changes);
   changes = changes->next;
   while (changes != NULL){
-    temp = strdup(&changes->text[changes->begin_edit+1]);
-    temp[strlen(temp)-1] = 0;
-    if (strcmp(changes->original,temp)){
-      strcpy(path,changes->text);
-      changes->text[strlen(changes->text)-1]=0;
-      strcpy(&path[changes->begin_edit+1],changes->original);
-      printf("Renaming %s to %s\n",path,changes->text);
-      rename(path,changes->text);
+    if (strcmp(changes->original,changes->revised)){
+      strcpy(old_file_w_path, changes->path);
+      strcat(old_file_w_path, changes->original);
+      strcpy(new_file_w_path, changes->path);
+      strcat(new_file_w_path, changes->revised);
+      printf("Renaming %s to %s\n",old_file_w_path,new_file_w_path);
+      rename(old_file_w_path,new_file_w_path);
     }
-    free(changes->text);
+    free(changes->revised);
     free(changes->original);
     free(changes);
-    free(temp);
     changes = changes->next;
   }
 }

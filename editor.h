@@ -13,10 +13,12 @@
 #define CLEAR_LINE "\033[2K"
 #define GET_CURSOR "\033[6n"
 
-typedef struct line { 
+typedef struct line {
   int file_offset;
-  int begin_edit; 
-  char* text; 
+  int begin_edit;
+  char* path;
+
+  char* revised;
   char* original;
   struct line* next;
 } line;
@@ -27,7 +29,7 @@ struct screen {
   struct line* current_line;
   int rows, cols;
   int cur_row, cur_col;
-  
+
   //used when tracking whole file
   struct line* current_top;
 };
@@ -36,14 +38,14 @@ struct termios;
 struct winsize;
 
 /*
-cleanup - frees allocated memory
-@param screen * - struct that represents the virtual window pre-initialized with its dimensions
+* cleanup - frees allocated memory
+* @param screen * - struct that represents the virtual window pre-initialized with its dimensions
 */
 int cleanup(struct screen*);
 
 /*
-fileops - applies changes to the actual file
-@param screen * - struct that represents virtual window and all lines
+* fileops - applies changes to the actual file
+* @param screen * - struct that represents virtual window and all lines
 */
 int fileops(struct screen*);
 
