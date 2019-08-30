@@ -27,3 +27,6 @@ Since renaming files is allowed, the application may as well integrate moving an
 -Segfaults when one scrolls too quickly<br>
 -Problems with small screen sizes<br>
 -Scrolling downwards sometimes causes the cursor to jump into the information buffer. It is necessary to scroll back up in order to scroll properly again.
+
+# Revision Log
+8/30 - Fixed the problem where the cursor jumps into the information buffer

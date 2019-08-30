@@ -23,6 +23,23 @@ int print_buffers(struct screen* term_screen){
 }
 
 /*
+  Updates the position of the cursor relative to its current position
+  The y-axis increases going down.
+*/
+int step_cursor(struct screen* term_screen, int vert_change, int hor_change){
+  term_screen->cur_row+=vert_change;
+  term_screen->cur_col+=hor_change;
+  while (hor_change>0){
+    printf(CURSOR_RIGHT);
+    hor_change--;
+  }
+  while (hor_change<0){
+    printf(CURSOR_LEFT);
+    hor_change++;
+  }
+}
+
+/*
   Updates the position of the cursor in the terminal window.
 */
 int get_cursor(struct screen* term_screen){
@@ -82,6 +99,7 @@ int detect_keypress(struct screen* term_screen){
         else{
           printf(CURSOR_UP);
         }
+        get_cursor(term_screen);
       }
       //DOWN
       else if (key == 66){
@@ -93,45 +111,43 @@ int detect_keypress(struct screen* term_screen){
         else{
           printf(CURSOR_DOWN);
         }
+        get_cursor(term_screen);
       }
       //RIGHT
       else if (key == 67){
-        printf(CURSOR_RIGHT);
+        step_cursor(term_screen,0,STEP_RIGHT);
       }
       //LEFT
       else if (key == 68){
-        printf(CURSOR_LEFT);
+        step_cursor(term_screen,0,STEP_LEFT);
       }
-      get_cursor(term_screen);
     }
   }
-  else if (term_screen->cur_col-1 <= term_screen->current_line->begin_edit ||
+  else if (term_screen->cur_col <= term_screen->current_line->begin_edit ||
      term_screen->cur_col-1 > strlen(term_screen->current_line->revised)+strlen(term_screen->current_line->path)-1){
     return 1;
   }
   else if (key == 127){//backspace
-    printf(CURSOR_LEFT);
+    step_cursor(term_screen,0,STEP_LEFT);
     printf(CURSOR_SAVE);
     line* cur = term_screen->current_line;
-    strcpy(&cur->revised[term_screen->cur_col-cur->begin_edit-3],&cur->revised[term_screen->cur_col-cur->begin_edit-2]);
+    strcpy(&cur->revised[term_screen->cur_col-cur->begin_edit-1],&cur->revised[term_screen->cur_col-cur->begin_edit]);
     printf(CLEAR_LINE);
     printf("\r%*s\r%s%s",term_screen->cols,cur->original,cur->path,cur->revised);
     printf(CURSOR_RESTORE);
-    term_screen->cur_col = term_screen->cur_col - 1;
   }
   else{
-    printf(CURSOR_RIGHT);
     printf(CURSOR_SAVE);
     char temp[term_screen->cols];
     temp[0] = (char)key;
     temp[1] = 0;
     line* cur = term_screen->current_line;
-    strcat(temp,&cur->revised[(term_screen->cur_col)-(cur->begin_edit+2)]);
-    strcpy(&cur->revised[term_screen->cur_col-(cur->begin_edit+2)],temp);
+    strcat(temp,&cur->revised[(term_screen->cur_col)-(cur->begin_edit+1)]);
+    strcpy(&cur->revised[term_screen->cur_col-(cur->begin_edit+1)],temp);
     printf(CLEAR_LINE);
     printf("\r%*s\r%s%s",term_screen->cols,cur->original,cur->path,cur->revised);
     printf(CURSOR_RESTORE);
-    term_screen->cur_col = term_screen->cur_col + 1;
+    step_cursor(term_screen,0,STEP_RIGHT);;
   }
 }
 

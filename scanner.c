@@ -18,15 +18,15 @@ int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
     cur_line = (line*)malloc(sizeof(line));
     //line processing
     *(unparsed+strlen(unparsed)-1)=0;
-    cur_line->begin_edit=strrchr(unparsed,'/')-(unparsed);
+    cur_line->begin_edit=strrchr(unparsed,'/')-(unparsed)+1;
     //allocation
     cur_line->path = unparsed;
     cur_line->original = (char*)malloc(term_screen->cols);
     cur_line->revised = (char*)malloc(term_screen->cols);
     //initialization
-    strcpy(cur_line->original,&cur_line->path[cur_line->begin_edit+1]);
+    strcpy(cur_line->original,&cur_line->path[cur_line->begin_edit]);
     strcpy(cur_line->revised,cur_line->original);
-    cur_line->path[cur_line->begin_edit+1] = 0;
+    cur_line->path[cur_line->begin_edit] = 0;
 
     if (term_screen->lines == NULL){
       term_screen->lines = cur_line;
