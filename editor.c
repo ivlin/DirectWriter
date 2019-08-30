@@ -14,8 +14,6 @@ editor.c - main file for editing operations
 #include "io.h"
 #include "dirinfo.h"
 
-char blah[1000];
-
 int main(){
   struct termios term;
   struct winsize window;
@@ -27,21 +25,29 @@ int main(){
   term_screen->lines = NULL;
   term_screen->changed_lines = NULL;
   term_screen->current_top = NULL;
-  //term_screen->lines = (line*)malloc(sizeof(line));
-  //term_screen->changed_lines = (line*)malloc(sizeof(line));
-  //term_screen->current_top = term_screen->lines;
 
   FILE* map = generate_map_file(".");
   rewind(map);
 
-  init_and_fill_buffers(map,term_screen);
+  int min_win_width = init_and_fill_buffers(map,term_screen);
 
   open_screen_buffer(&term);
 
-  print_buffers(term_screen);
+  if (term_screen->cols <= min_win_width){
+    for (int i=0;i<term_screen->rows/2-3;i++){
+      printf("\n");
+    }
+    printf("We would like to apologize. Your window is too small to properly display the information.\n");
+    printf("Please resize your terminal or reduce the font size.\n");
+    printf("If you are working in a deep directory, try running this at a lower level.\n");
+    printf("We are working to fix this problem.\n");
+    printf("Enter CTRL+Q to exit.\n");
+  }
+  else{
+    print_buffers(term_screen);
+  }
 
   while (detect_keypress(term_screen));
-  //printf("wut\n");
 
   open_preserved_screen(&term);
 
@@ -57,7 +63,6 @@ int cleanup(struct screen* term_screen){
   line* line_node = term_screen->lines;
   line* changed = NULL;
   while (line_node){
-    printf("hi\n");
     if (strcmp(line_node->original,line_node->revised)){
       //printf("%s v %s\n",line_node->original,line_node->revised);
       if (term_screen->changed_lines==NULL){

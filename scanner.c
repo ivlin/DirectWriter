@@ -8,12 +8,14 @@
 
 /*
   Initializes each line in term_screen using the input from the indicated file stream.
+  Return the length of the longest path+file name.
 */
 
 int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
   line *cur_line, *prev_line;
   char* unparsed=NULL;
   size_t buff_size = 0;
+  int longest_str_size=0;
   while (getline(&unparsed,&buff_size,fstream)!=-1){
     cur_line = (line*)malloc(sizeof(line));
     //line processing
@@ -24,8 +26,8 @@ int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
     cur_line->original = (char*)malloc(term_screen->cols);
     cur_line->revised = (char*)malloc(term_screen->cols);
     //initialization
-    strcpy(cur_line->original,&cur_line->path[cur_line->begin_edit]);
-    strcpy(cur_line->revised,cur_line->original);
+    strncpy(cur_line->original,&cur_line->path[cur_line->begin_edit],term_screen->cols);
+    strncpy(cur_line->revised,cur_line->original,term_screen->cols);
     cur_line->path[cur_line->begin_edit] = 0;
 
     if (term_screen->lines == NULL){
@@ -38,5 +40,9 @@ int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
 
     prev_line=cur_line;
     unparsed=NULL;
+
+    int min_cols = strlen(cur_line->path)+strlen(cur_line->original)+strlen(cur_line->revised);
+    longest_str_size = min_cols > longest_str_size ? min_cols : longest_str_size;
   }
+  return longest_str_size;
 }
