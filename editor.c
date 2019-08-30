@@ -57,18 +57,19 @@ int cleanup(struct screen* term_screen){
   line* line_node = term_screen->lines;
   line* changed = NULL;
   while (line_node){
+    printf("hi\n");
     if (strcmp(line_node->original,line_node->revised)){
+      //printf("%s v %s\n",line_node->original,line_node->revised);
       if (term_screen->changed_lines==NULL){
         term_screen->changed_lines=line_node;
         changed=line_node;
       }
       else{
-        printf("%s v %s\n",line_node->original,line_node->revised);
         changed->next=line_node;
         changed=changed->next;
       }
-      changed->next = NULL;
       line_node = line_node->next;
+      changed->next = NULL;
     }
     else{
       free(line_node);
