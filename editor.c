@@ -14,6 +14,8 @@ editor.c - main file for editing operations
 #include "io.h"
 #include "dirinfo.h"
 
+char blah[1000];
+
 int main(){
   struct termios term;
   struct winsize window;
@@ -22,9 +24,12 @@ int main(){
   struct screen* term_screen = (struct screen*)malloc(sizeof(struct screen));
   term_screen->rows=window.ws_row;
   term_screen->cols=window.ws_col;
-  term_screen->lines = (line*)malloc(sizeof(line));
-  term_screen->changed_lines = (line*)malloc(sizeof(line));
-  term_screen->current_top = term_screen->lines;
+  term_screen->lines = NULL;
+  term_screen->changed_lines = NULL;
+  term_screen->current_top = NULL;
+  //term_screen->lines = (line*)malloc(sizeof(line));
+  //term_screen->changed_lines = (line*)malloc(sizeof(line));
+  //term_screen->current_top = term_screen->lines;
 
   FILE* map = generate_map_file(".");
   rewind(map);
@@ -36,6 +41,7 @@ int main(){
   print_buffers(term_screen);
 
   while (detect_keypress(term_screen));
+  //printf("wut\n");
 
   open_preserved_screen(&term);
 
@@ -49,19 +55,20 @@ int main(){
 */
 int cleanup(struct screen* term_screen){
   line* line_node = term_screen->lines;
-  line* changed = term_screen->changed_lines;
-  while (changed->next != NULL){
-    changed = changed->next;
-  }
-  char* temp;
-  while (line_node->next){
-    temp = strdup(&line_node->revised[line_node->begin_edit+1]);
-    temp[strlen(temp)-1] = 0;
-    if (strcmp(line_node->original,temp)){
-      changed->next = line_node;
-      changed = changed->next;
-      line_node = line_node->next;
+  line* changed = NULL;
+  while (line_node){
+    if (strcmp(line_node->original,line_node->revised)){
+      if (term_screen->changed_lines==NULL){
+        term_screen->changed_lines=line_node;
+        changed=line_node;
+      }
+      else{
+        printf("%s v %s\n",line_node->original,line_node->revised);
+        changed->next=line_node;
+        changed=changed->next;
+      }
       changed->next = NULL;
+      line_node = line_node->next;
     }
     else{
       free(line_node);
@@ -69,7 +76,6 @@ int cleanup(struct screen* term_screen){
       free(line_node->original);
       line_node = line_node->next;
     }
-    free(temp);
   }
   return 0;
 }
@@ -81,8 +87,6 @@ int fileops(struct screen* term_screen){
   line* changes = term_screen->changed_lines;
   char old_file_w_path[512];
   char new_file_w_path[512];
-  free(changes);
-  changes = changes->next;
   while (changes != NULL){
     if (strcmp(changes->original,changes->revised)){
       strcpy(old_file_w_path, changes->path);

@@ -8,25 +8,59 @@
 
 /*
   Initializes each line in term_screen using the input from the indicated file stream.
-*/
+
 int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
-  line* line_node = term_screen->lines;
-  size_t buff_size = sizeof(line_node->path);
-  while (getline(&line_node->path,&buff_size,fstream)!=-1){
+  line* cur_line = term_screen->lines;
+  char* unparsed;
+  size_t buff_size = sizeof(cur_line->path);
+
+  while (getline(&cur_line->path,&buff_size,fstream)!=-1){
     //line processing
-    line_node->path[strlen(line_node->path)-1]=0;
-    line_node->begin_edit=strrchr(line_node->path,'/')-(line_node->path);
+    cur_line->path[strlen(cur_line->path)-1]=0;
+    cur_line->begin_edit=strrchr(cur_line->path,'/')-(cur_line->path);
     //allocation
-    line_node->original = (char*)malloc(term_screen->cols);
-    line_node->revised = (char*)malloc(term_screen->cols);
+    cur_line->original = (char*)malloc(term_screen->cols);
+    cur_line->revised = (char*)malloc(term_screen->cols);
     //initialization
-    strcpy(line_node->original,&line_node->path[line_node->begin_edit+1]);
-    strcpy(line_node->revised,line_node->original);
-    line_node->path[line_node->begin_edit+1] = 0;
+    strcpy(cur_line->original,&cur_line->path[cur_line->begin_edit+1]);
+    strcpy(cur_line->revised,cur_line->original);
+    cur_line->path[cur_line->begin_edit+1] = 0;
+
+    cur_line->next = (line*)malloc(sizeof(line));
+    cur_line = cur_line->next;
+    cur_line->path = NULL;
+  }
+}
+*/
 
 
-    line_node->next = (line*)malloc(sizeof(line));
-    line_node = line_node->next;
-    line_node->path = NULL;
+int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
+  line *cur_line, *prev_line;
+  char* unparsed=NULL;
+  size_t buff_size = 0;
+  while (getline(&unparsed,&buff_size,fstream)!=-1){
+    cur_line = (line*)malloc(sizeof(line));
+    //line processing
+    *(unparsed+strlen(unparsed)-1)=0;
+    cur_line->begin_edit=strrchr(unparsed,'/')-(unparsed);
+    //allocation
+    cur_line->path = unparsed;
+    cur_line->original = (char*)malloc(term_screen->cols);
+    cur_line->revised = (char*)malloc(term_screen->cols);
+    //initialization
+    strcpy(cur_line->original,&cur_line->path[cur_line->begin_edit+1]);
+    strcpy(cur_line->revised,cur_line->original);
+    cur_line->path[cur_line->begin_edit+1] = 0;
+
+    if (term_screen->lines == NULL){
+      term_screen->lines = cur_line;
+      term_screen->current_top = term_screen->lines;
+    }
+    else{
+      prev_line->next = cur_line;
+    }
+
+    prev_line=cur_line;
+    unparsed=NULL;
   }
 }
