@@ -8,31 +8,7 @@
 
 /*
   Initializes each line in term_screen using the input from the indicated file stream.
-
-int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
-  line* cur_line = term_screen->lines;
-  char* unparsed;
-  size_t buff_size = sizeof(cur_line->path);
-
-  while (getline(&cur_line->path,&buff_size,fstream)!=-1){
-    //line processing
-    cur_line->path[strlen(cur_line->path)-1]=0;
-    cur_line->begin_edit=strrchr(cur_line->path,'/')-(cur_line->path);
-    //allocation
-    cur_line->original = (char*)malloc(term_screen->cols);
-    cur_line->revised = (char*)malloc(term_screen->cols);
-    //initialization
-    strcpy(cur_line->original,&cur_line->path[cur_line->begin_edit+1]);
-    strcpy(cur_line->revised,cur_line->original);
-    cur_line->path[cur_line->begin_edit+1] = 0;
-
-    cur_line->next = (line*)malloc(sizeof(line));
-    cur_line = cur_line->next;
-    cur_line->path = NULL;
-  }
-}
 */
-
 
 int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
   line *cur_line, *prev_line;
