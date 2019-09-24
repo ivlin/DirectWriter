@@ -47,6 +47,9 @@ int main(){
     print_buffers(term_screen);
   }
 
+  printf(CURSOR_ROW_COL,0,0);
+  get_cursor(term_screen);
+
   while (detect_keypress(term_screen));
 
   open_preserved_screen(&term);

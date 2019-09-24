@@ -16,6 +16,7 @@ int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
   char* unparsed=NULL;
   size_t buff_size = 0;
   int longest_str_size=0;
+  int counter=0;
   while (getline(&unparsed,&buff_size,fstream)!=-1){
     cur_line = (line*)malloc(sizeof(line));
     //line processing
@@ -43,6 +44,10 @@ int init_and_fill_buffers(FILE* fstream, struct screen* term_screen){
 
     int min_cols = strlen(cur_line->path)+strlen(cur_line->original)+strlen(cur_line->revised);
     longest_str_size = min_cols > longest_str_size ? min_cols : longest_str_size;
+
+    counter++;
   }
+  term_screen->num_lines=counter;
+  term_screen->cur_line_index=0;
   return longest_str_size;
 }

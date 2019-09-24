@@ -16,8 +16,13 @@ int print_buffers(struct screen* term_screen){
   struct line* first_line = term_screen->current_top;
   int i;
   for (i=0;i<term_screen->rows-1;i++){
-    printf("%*s\r%s%s\n",term_screen->cols,first_line->original,first_line->path,first_line->revised);
-    first_line = first_line->next;
+    if (first_line!=NULL){
+      printf("%*s\r%s%s\n",term_screen->cols,first_line->original,first_line->path,first_line->revised);
+      first_line = first_line->next;
+    }
+    else{
+      printf("\n");
+    }
   }
   printf("%*s\r%s",term_screen->cols,"ORIGINAL","NEWNAME(CTRL+Q to EXIT)");
 }
@@ -87,29 +92,37 @@ int detect_keypress(struct screen* term_screen){
       key = getchar();
       //UP
       if (key == 65){
-        if (term_screen->lines!=term_screen->current_top && term_screen->cur_row == 1){//up
-          line* cur;
-          for (cur=term_screen->lines;cur->next!=term_screen->current_top;cur=cur->next){
+        if (term_screen->cur_line_index > 0){
+          if (term_screen->lines!=term_screen->current_top && term_screen->cur_row == 1){//up
+            line* cur;
+            for (cur=term_screen->lines;cur->next!=term_screen->current_top;cur=cur->next){
+            }
+            term_screen->current_top=cur;
+            printf(CURSOR_SAVE);
+            print_buffers(term_screen);
+            printf(CURSOR_RESTORE);
+            term_screen->cur_line_index--;
           }
-          term_screen->current_top=cur;
-          printf(CURSOR_SAVE);
-          print_buffers(term_screen);
-          printf(CURSOR_RESTORE);
-        }
-        else{
-          printf(CURSOR_UP);
+          else{
+            printf(CURSOR_UP);
+            term_screen->cur_line_index--;
+          }
         }
         get_cursor(term_screen);
       }
       //DOWN
       else if (key == 66){
-        if (term_screen->cur_row >= term_screen->rows-1){
-          term_screen->current_top = term_screen->current_top->next;
-          print_buffers(term_screen);
-          printf(CURSOR_UP);
-        }
-        else{
-          printf(CURSOR_DOWN);
+        if (term_screen->cur_line_index < term_screen->num_lines-1){
+          if (term_screen->cur_row >= term_screen->rows-1){
+            term_screen->current_top = term_screen->current_top->next;
+            print_buffers(term_screen);
+            printf(CURSOR_UP);
+            term_screen->cur_line_index++;
+          }
+          else{
+            printf(CURSOR_DOWN);
+            term_screen->cur_line_index++;
+          }
         }
         get_cursor(term_screen);
       }
@@ -124,7 +137,7 @@ int detect_keypress(struct screen* term_screen){
     }
   }
   else if (term_screen->cur_col <= term_screen->current_line->begin_edit ||
-     term_screen->cur_col-1 > strlen(term_screen->current_line->revised)+strlen(term_screen->current_line->path)-1){
+     term_screen->cur_col-1 > strlen(term_screen->current_line->revised)+strlen(term_screen->current_line->path)){
     return 1;
   }
   else if (key == 127){//backspace

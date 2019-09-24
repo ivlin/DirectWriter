@@ -30,6 +30,7 @@ struct screen {
   int rows, cols;
   int cur_row, cur_col;
 
+  int num_lines, cur_line_index;
   //used when tracking whole file
   struct line* current_top;
 };
