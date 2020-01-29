@@ -4,6 +4,8 @@ A terminal based tool for easy, fast file manipulation. Written in C.
 # Description
 This project writes out the structure of a directory as text in your terminal. You can then edit the text in-terminal and any changes made through the editor will be applied to the actual file names, so all renaming can be done in one place.
 
+![Screenshot](https://github.com/ivlin/DirectWriter/blob/master/screenshot.png)
+
 # Motivation
 While simple scripts and regexes can easily rename large batches files with a consistent naming scheme, things are not as simple when the original or modified filenames don't follow any specific pattern. Whether on GUI or command line, the process becomes a tedious process of keystrokes. Directory Writer reduces the time spent on this meaningless labour.
 
